@@ -82,11 +82,34 @@ jobs:
     needs: prepare
     runs-on: windows-latest
     steps:
-      - name: Placeholder
-        run: |
-          echo "Windows packaging is not implemented yet."
-          echo "This bundled CD workflow intentionally blocks release until Windows packaging exists."
-          exit 1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Windows desktop packages
+        run: npm run package:desktop:windows
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop-${{ needs.prepare.outputs.version }}
+          path: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/nsis/*.exe
 
   package-android:
     needs: prepare
@@ -112,6 +135,12 @@ jobs:
         with:
           name: linux-desktop-${{ needs.prepare.outputs.version }}
           path: release-assets/linux
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-desktop-${{ needs.prepare.outputs.version }}
+          path: release-assets/windows
 
       - name: Create GitHub release placeholder
         run: |
