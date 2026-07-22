@@ -12,6 +12,7 @@ const args = ['tauri', 'build', '--bundles', 'msi,nsis']
 const child = spawn(command, args, {
   stdio: 'inherit',
   env: process.env,
+  shell: true,
 })
 
 child.on('exit', (code) => {
