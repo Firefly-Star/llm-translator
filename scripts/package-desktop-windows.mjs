@@ -7,7 +7,7 @@ if (process.platform !== 'win32') {
 }
 
 const command = 'npx.cmd'
-const args = ['tauri', 'build', '--bundles', 'msi,nsis']
+const args = ['tauri', 'build', '--bundles', 'msi']
 
 const child = spawn(command, args, {
   stdio: 'inherit',

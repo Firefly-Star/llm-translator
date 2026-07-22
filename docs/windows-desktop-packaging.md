@@ -10,13 +10,14 @@ npm run package:desktop:windows
 
 ## Intended outputs
 
-This command is designed to request Tauri Windows bundles:
+This command currently requests only the Tauri Windows MSI bundle:
 - `msi`
-- `nsis`
 
-That corresponds to:
-- MSI installer
-- NSIS-based installer EXE
+The release workflow intentionally publishes MSI only for now.
+
+## Why EXE is paused
+
+NSIS `.exe` packaging is intentionally paused while MSI installation layout is being refined. The current public Windows delivery target is narrowed to MSI only.
 
 ## Current behavior on non-Windows hosts
 
