@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "package:desktop:linux": "node ./scripts/package-desktop-linux.mjs"
+    "package:desktop:linux": "node ./scripts/package-desktop-linux.mjs",
+    "package:desktop:windows": "node ./scripts/package-desktop-windows.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",
