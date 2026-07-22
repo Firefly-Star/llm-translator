@@ -1,32 +1,321 @@
-# React + TypeScript + Vite
+# LLM Translator
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+一个面向个人使用的本地 LLM 翻译工具。
 
-Currently, two official plugins are available:
+它提供：
+- 类翻译软件的双栏界面
+- 多套 LLM 配置保存 / 切换 / 测速
+- 源语言 / 目标语言选择
+- 自动检测源语言
+- 流式翻译输出
+- 输入停顿后自动翻译
+- 本地持久化（localStorage）
+- 桌面封装（Tauri）
+- Android 封装（Capacitor）
+- GitHub Actions CI / Bundled CD 工作流
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+仓库地址：
+- https://github.com/Firefly-Star/llm-translator
 
-## React Compiler
+## 当前状态
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+已完成：
+- Web 前端可用
+- Linux 桌面打包可用（deb / rpm）
+- Windows 桌面打包主线已切为 NSIS `.exe`
+- Android APK 打包链路已接入
+- 每次提交自动跑 CI（test + build）
+- Bundled CD 支持三端捆绑式发布
 
-## Expanding the Oxlint configuration
+当前 GitHub Release 目标产物：
+- Linux: `.deb`, `.rpm`
+- Windows: `.exe`
+- Android: `.apk`
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 技术栈
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+前端：
+- React
+- TypeScript
+- Vite
+
+桌面端：
+- Tauri
+
+移动端：
+- Capacitor Android
+
+CI/CD：
+- GitHub Actions
+
+## 项目结构
+
+```text
+llm-translator/
+├─ src/                      # 前端业务代码（单一事实来源）
+├─ public/                   # 静态资源
+├─ dist/                     # Vite 构建产物
+├─ src-tauri/                # Tauri 桌面封装层
+├─ android/                  # Capacitor Android 工程
+├─ scripts/                  # 打包/辅助脚本
+├─ docs/                     # 项目内文档
+└─ .github/workflows/        # CI/CD 工作流
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+设计原则：
+- 前端业务逻辑只放在 `src/`
+- Tauri / Capacitor 都只是薄封装层
+- 前端改动后，只需要重新封装，不需要改业务壳层代码
+
+## Web 开发
+
+安装依赖：
+
+```bash
+npm ci
+```
+
+启动开发服务器：
+
+```bash
+npm run dev
+```
+
+开发服务器带端口避让逻辑：
+- 默认尝试 5173
+- 最多避让 4 次
+- 实际尝试：5173 / 5174 / 5175 / 5176 / 5177
+- 如果全部占用，会报错退出
+
+构建 Web：
+
+```bash
+npm run build
+```
+
+本地预览：
+
+```bash
+npm run preview -- --host
+```
+
+## 测试
+
+运行测试：
+
+```bash
+npm test
+```
+
+监听模式：
+
+```bash
+npm run test:watch
+```
+
+当前测试覆盖了：
+- 本地存储读写
+- 自动翻译触发逻辑
+- 语言选择逻辑
+- 配置 CRUD 辅助函数
+- 流式 chunk 解析
+- 主界面基础交互
+
+## Linux 桌面打包
+
+稳定命令：
+
+```bash
+npm run package:desktop:linux
+```
+
+当前会产出：
+- `.deb`
+- `.rpm`
+
+产物目录通常在：
+
+```text
+src-tauri/target/release/bundle/deb/
+src-tauri/target/release/bundle/rpm/
+```
+
+## Windows 桌面打包
+
+稳定命令（需要在 Windows 环境执行）：
+
+```bash
+npm run package:desktop:windows
+```
+
+当前 Windows 主发布物为：
+- NSIS 安装器 `.exe`
+
+说明：
+- Windows 打包应优先在 `windows-latest` GitHub runner 或本地 Windows 环境验证
+- 当前不再主推 `.msi`
+
+## Android APK 打包
+
+同步 Web 产物到 Android：
+
+```bash
+npm run android:sync
+```
+
+构建 APK：
+
+```bash
+npm run package:android
+```
+
+当前 APK 目标产物路径通常为：
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+## Tauri / Capacitor 开发命令
+
+Tauri 开发模式：
+
+```bash
+npm run tauri:dev
+```
+
+Tauri 通用打包：
+
+```bash
+npm run tauri:build
+```
+
+Android 同步：
+
+```bash
+npm run android:sync
+```
+
+Android 打包：
+
+```bash
+npm run package:android
+```
+
+## GitHub Actions
+
+### CI
+
+文件：
+- `.github/workflows/ci.yml`
+
+触发：
+- `push`
+- `pull_request`
+
+执行：
+- `npm ci`
+- `npm test`
+- `npm run build`
+
+目标：
+- 每个提交都必须经过 test + build
+- 但每个提交不自动触发多平台打包
+
+### Bundled CD
+
+文件：
+- `.github/workflows/cd.yml`
+
+触发：
+- `workflow_dispatch`
+
+输入：
+- `version`
+
+工作流逻辑：
+- Linux 打包
+- Windows 打包
+- Android APK 打包
+- 三端全部成功后，才创建 GitHub Release
+- Release 页面直接上传最终产物，而不是只保留 artifact zip
+
+当前发布到 Release 的文件：
+- Linux: `.deb`, `.rpm`
+- Windows: `.exe`
+- Android: `.apk`
+
+## 使用说明
+
+### LLM 配置
+
+应用内可以保存多套配置，每套配置包含：
+- 名称
+- provider
+- baseUrl
+- apiKey
+- model
+- systemPrompt
+- temperature
+
+测速会对单个配置发送简短请求，验证接口是否正常工作。
+
+### 翻译方向
+
+支持：
+- 源语言选择
+- 自动检测源语言
+- 目标语言选择
+- 交换语言方向
+
+当输入文本存在时，切换源/目标语言会重新触发翻译条件。
+
+### 自动翻译
+
+当输入框内容停止变化一段时间后，会自动发起翻译请求。
+
+防重逻辑已处理，避免出现：
+- 文本一直不变
+- 每隔 t 秒重复请求一次
+
+## 持久化
+
+当前使用浏览器 `localStorage` 保存：
+- 配置列表
+- 当前激活配置
+- 自动翻译延迟
+- 源语言
+- 目标语言
+- 输入文本
+- 输出文本
+
+## 发布策略
+
+当前发布策略是“三端捆绑发布”：
+- Linux
+- Windows
+- Android
+
+只有三端都打包成功，才创建正式 GitHub Release。
+
+这保证：
+- 不会出现某一端先发布、另一端缺失的情况
+- release 页面中的版本始终是完整的三端版本
+
+## 已知约束
+
+- Windows 打包需要 Windows 环境或 GitHub Windows runner
+- Android 打包依赖 Java + Android SDK
+- Linux 打包依赖桌面系统库（dbus / gtk / webkit 等）
+- AppImage 当前不是主发布目标
+
+## 后续可以继续做的方向
+
+- Android release 包（非 debug APK）
+- Windows 安装体验进一步收敛
+- 自动生成版本号 / tag / changelog
+- 发布页文案与产物命名优化
+- 更强的配置导入 / 导出能力
+
+## 许可证
+
+当前仓库尚未单独补充 LICENSE 文件；如需开源发布建议补充。
