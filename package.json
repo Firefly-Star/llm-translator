@@ -13,9 +13,14 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "package:desktop:linux": "node ./scripts/package-desktop-linux.mjs",
-    "package:desktop:windows": "node ./scripts/package-desktop-windows.mjs"
+    "package:desktop:windows": "node ./scripts/package-desktop-windows.mjs",
+    "android:sync": "node ./scripts/android-sync.mjs",
+    "package:android": "node ./scripts/package-android.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },

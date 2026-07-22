@@ -115,11 +115,39 @@ jobs:
     needs: prepare
     runs-on: ubuntu-latest
     steps:
-      - name: Placeholder
-        run: |
-          echo "Android APK packaging is not implemented yet."
-          echo "This bundled CD workflow intentionally blocks release until Android packaging exists."
-          exit 1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Android APK
+        run: npm run package:android
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-${{ needs.prepare.outputs.version }}
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
 
   release:
     needs:
@@ -141,6 +169,12 @@ jobs:
         with:
           name: windows-desktop-${{ needs.prepare.outputs.version }}
           path: release-assets/windows
+
+      - name: Download Android artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk-${{ needs.prepare.outputs.version }}
+          path: release-assets/android
 
       - name: Create GitHub release placeholder
         run: |
