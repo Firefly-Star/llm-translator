@@ -7,9 +7,9 @@ Bundled CD now creates a real GitHub Release and uploads final artifacts directl
 ## Published asset types
 
 - Linux: `.deb`, `.rpm`
-- Windows: `.msi`
+- Windows: `.exe`
 - Android: `.apk`
 
-## Why `.exe` is not on the release
+## Why `.msi` is not on the release
 
-Windows NSIS `.exe` packaging is intentionally not published for now while MSI installation layout is being refined. The current release surface is narrowed to the requested assets only.
+Windows MSI packaging is intentionally not published because the installation layout did not match the desired end-user experience. The current Windows release surface is narrowed to the NSIS installer EXE only.
