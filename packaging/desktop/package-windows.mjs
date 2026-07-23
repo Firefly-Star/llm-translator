@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
+import { getRepoRoot } from '../../scripts/repo-root.mjs'
 
 if (process.platform !== 'win32') {
   console.error('package:desktop:windows 需要在 Windows 环境中运行。')
   process.exit(1)
 }
 
+const repoRoot = getRepoRoot(import.meta.url)
 const command = 'npx.cmd'
 const args = ['tauri', 'build', '--bundles', 'nsis']
 
 const child = spawn(command, args, {
+  cwd: repoRoot,
   stdio: 'inherit',
   env: process.env,
   shell: true,

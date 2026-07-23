@@ -86,6 +86,26 @@ llm-translator/
 - `packaging/desktop/tauri/` 才是桌面封装层的真实目录
 - 顶层 `src-tauri` 只是指向 `packaging/desktop/tauri/` 的软链接，用于兼容 Tauri 的默认目录约定
 
+## 路径策略
+
+本项目的路径策略分两类：
+
+1. 自定义脚本（我们自己写的 `.mjs` 脚本）
+- 统一以仓库根目录作为逻辑基准
+- 通过共享 helper 计算 `repoRoot`
+- 再从 `repoRoot` 往下拼目标路径
+- 尽量避免在脚本里直接维护大量 `../` 相对上跳路径
+
+2. 第三方配置文件
+- 例如 Tauri / Capacitor / Gradle 配置
+- 保留这些工具自身的路径语义
+- 某些地方仍会出现 `../`，这是工具约定，不属于自定义脚本层面的维护规则
+
+对于桌面封装层：
+- `packaging/desktop/tauri/` 是真实目录
+- 顶层 `src-tauri` 是指向它的软链接兼容入口
+- 修改桌面封装层内容时，应以 `packaging/desktop/tauri/` 为准
+
 ## Web 开发
 
 安装依赖：
