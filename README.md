@@ -56,11 +56,11 @@ llm-translator/
 ├─ public/                       # 前端静态资源
 ├─ packaging/
 │  ├─ desktop/
-│  │  ├─ tauri/                  # Tauri 桌面封装层
+│  │  ├─ tauri/                  # Tauri 桌面封装层（真实目录）
 │  │  ├─ package-linux.mjs       # Linux 桌面打包脚本
 │  │  └─ package-windows.mjs     # Windows 桌面打包脚本
 │  └─ android/
-│     ├─ android/                # Capacitor Android 原生工程
+│     ├─ android/                # Capacitor Android 原生工程（真实目录）
 │     ├─ sync.mjs                # Android 同步脚本
 │     └─ package-android.mjs     # Android APK 打包脚本
 ├─ scripts/                      # 通用开发辅助脚本
@@ -73,6 +73,8 @@ llm-translator/
 ├─ tsconfig.app.json
 ├─ tsconfig.node.json
 ├─ capacitor.config.ts
+├─ src-tauri -> packaging/desktop/tauri
+│                                 # 兼容 Tauri 默认目录行为的软链接入口
 └─ README.md
 ```
 
@@ -81,6 +83,8 @@ llm-translator/
 - Tauri / Capacitor 都只是薄封装层
 - 前端改动后，只需要重新封装，不需要改业务壳层代码
 - 顶层只保留共享入口文件与通用配置
+- `packaging/desktop/tauri/` 才是桌面封装层的真实目录
+- 顶层 `src-tauri` 只是指向 `packaging/desktop/tauri/` 的软链接，用于兼容 Tauri 的默认目录约定
 
 ## Web 开发
 
