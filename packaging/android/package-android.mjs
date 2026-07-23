@@ -1,10 +1,15 @@
 #!/usr/bin/env node
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 
 const command = process.platform === 'win32' ? 'gradlew.bat' : './gradlew'
+const scriptDir = dirname(fileURLToPath(import.meta.url))
+const repoRoot = resolve(scriptDir, '..', '..')
+const androidProjectDir = resolve(scriptDir, 'android')
 
 function run(commandName, args, cwd) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolvePromise, reject) => {
     const child = spawn(commandName, args, {
       cwd,
       stdio: 'inherit',
@@ -14,7 +19,7 @@ function run(commandName, args, cwd) {
 
     child.on('exit', (code) => {
       if ((code ?? 0) === 0) {
-        resolve(undefined)
+        resolvePromise(undefined)
       } else {
         reject(new Error(`${commandName} ${args.join(' ')} failed with exit code ${code}`))
       }
@@ -22,5 +27,5 @@ function run(commandName, args, cwd) {
   })
 }
 
-await run(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['cap', 'sync', 'android'], process.cwd())
-await run(command, ['assembleDebug'], `${process.cwd()}/android`)
+await run(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['cap', 'sync', 'android'], repoRoot)
+await run(command, ['assembleDebug'], androidProjectDir)

@@ -12,10 +12,10 @@
     "preview": "vite preview",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "package:desktop:linux": "node ./scripts/package-desktop-linux.mjs",
-    "package:desktop:windows": "node ./scripts/package-desktop-windows.mjs",
-    "android:sync": "node ./scripts/android-sync.mjs",
-    "package:android": "node ./scripts/package-android.mjs"
+    "package:desktop:linux": "node ./packaging/desktop/package-linux.mjs",
+    "package:desktop:windows": "node ./packaging/desktop/package-windows.mjs",
+    "android:sync": "node ./packaging/android/sync.mjs",
+    "package:android": "node ./packaging/android/package-android.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",

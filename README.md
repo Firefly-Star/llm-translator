@@ -22,7 +22,7 @@
 已完成：
 - Web 前端可用
 - Linux 桌面打包可用（deb / rpm）
-- Windows 桌面打包主线已切为 NSIS `.exe`
+- Windows 桌面打包主线为 NSIS `.exe`
 - Android APK 打包链路已接入
 - 每次提交自动跑 CI（test + build）
 - Bundled CD 支持三端捆绑式发布
@@ -52,20 +52,35 @@ CI/CD：
 
 ```text
 llm-translator/
-├─ src/                      # 前端业务代码（单一事实来源）
-├─ public/                   # 静态资源
-├─ dist/                     # Vite 构建产物
-├─ src-tauri/                # Tauri 桌面封装层
-├─ android/                  # Capacitor Android 工程
-├─ scripts/                  # 打包/辅助脚本
-├─ docs/                     # 项目内文档
-└─ .github/workflows/        # CI/CD 工作流
+├─ src/                          # 前端业务代码（单一事实来源）
+├─ public/                       # 前端静态资源
+├─ packaging/
+│  ├─ desktop/
+│  │  ├─ tauri/                  # Tauri 桌面封装层
+│  │  ├─ package-linux.mjs       # Linux 桌面打包脚本
+│  │  └─ package-windows.mjs     # Windows 桌面打包脚本
+│  └─ android/
+│     ├─ android/                # Capacitor Android 原生工程
+│     ├─ sync.mjs                # Android 同步脚本
+│     └─ package-android.mjs     # Android APK 打包脚本
+├─ scripts/                      # 通用开发辅助脚本
+├─ docs/                         # 项目文档
+├─ .github/workflows/            # CI/CD 工作流
+├─ package.json                  # 共享 npm 入口
+├─ package-lock.json
+├─ vite.config.ts
+├─ tsconfig.json
+├─ tsconfig.app.json
+├─ tsconfig.node.json
+├─ capacitor.config.ts
+└─ README.md
 ```
 
 设计原则：
 - 前端业务逻辑只放在 `src/`
 - Tauri / Capacitor 都只是薄封装层
 - 前端改动后，只需要重新封装，不需要改业务壳层代码
+- 顶层只保留共享入口文件与通用配置
 
 ## Web 开发
 
@@ -136,8 +151,8 @@ npm run package:desktop:linux
 产物目录通常在：
 
 ```text
-src-tauri/target/release/bundle/deb/
-src-tauri/target/release/bundle/rpm/
+packaging/desktop/tauri/target/release/bundle/deb/
+packaging/desktop/tauri/target/release/bundle/rpm/
 ```
 
 ## Windows 桌面打包
@@ -172,7 +187,7 @@ npm run package:android
 当前 APK 目标产物路径通常为：
 
 ```text
-android/app/build/outputs/apk/debug/app-debug.apk
+packaging/android/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## Tauri / Capacitor 开发命令
@@ -236,7 +251,7 @@ npm run package:android
 - Linux 打包
 - Windows 打包
 - Android APK 打包
-- 三端全部成功后，才创建 GitHub Release
+- 三端全部成功后，才创建正式 GitHub Release
 - Release 页面直接上传最终产物，而不是只保留 artifact zip
 
 当前发布到 Release 的文件：
